@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Mary's</title>
+    <link href="./main.css" rel="stylesheet">
+  </head>
+
+  <body onload="main()">
+    <div class = "row">
+    <div class="column">
+    <canvas id="webgl" width="800" height="800">
+    Please use a browser that supports "canvas"
+    </canvas>
+    </div>
+    <div class="column">
+    <h1>Controls</h1>
+      <h2>W/S: </h2><p>Camera: Move Forward and Back</p>
+      <h2>A/D: </h2><p>Camera: Move Left and Right</p>
+      <h2>Q/E: </h2><p>Camera: Look Pivot Left and Pivot Right</p>
+      <h2>L: </h2><p>Toggle lights on and off</p>
+      <h2>Arrow Keys: </h2><p>Rotate object</p>
+
+
+
+  </div>
+  </div>
+    <script src="../lib/webgl-utils.js"></script>
+    <script src="../lib/webgl-debug.js"></script>
+    <script src="../lib/cuon-utils.js"></script>
+    <script src="../lib/cuon-matrix.js"></script>
+    <script src="./scene3.js"></script>
+  </body>
+</html>
