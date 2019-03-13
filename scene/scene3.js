@@ -30,7 +30,7 @@ var VSHADER_SOURCE =
   '  {\n' +
   '  v_Position2 = vec3(u_ModelMatrix * a_Position);\n' +
  
-  '     v_Normal = normalize(vec3(u_NormalMatrix * a_Normal).xyz);\n' + //this is also used for normal point lighting
+  '  v_Normal = normalize(vec3(u_NormalMatrix * a_Normal).xyz);\n' + //this is also used for normal point lighting
 'v_Color = a_Color;\n'+
 
   '  }else\n' +
@@ -50,7 +50,6 @@ var FSHADER_SOURCE =
   'uniform bool u_UseTextures;\n' +
 
   'uniform sampler2D u_Sampler;\n' +
-  //'uniform sampler2D u_Sampler1;\n' +
 
   'uniform vec3 u_AmbientLight;\n' +  
   'varying vec3 v_Normal;\n' +
@@ -68,6 +67,7 @@ var FSHADER_SOURCE =
   // The dot product of the light direction and the orientation of a surface (the normal)
 '  float nDotL = max(dot(lightDirection, normal), 0.0);\n' +
 '  vec4 color0 = texture2D(u_Sampler, v_TexCoord);\n' +
+
 'vec4 fragColor = v_Color;\n'+
  ' if (u_UseTextures){\n' +
 
@@ -159,11 +159,17 @@ function main() {
   var u_isLighting = gl.getUniformLocation(gl.program, 'u_isLighting'); 
   var u_UseTextures = gl.getUniformLocation(gl.program, 'u_UseTextures'); 
 
-  gl.uniform1i(u_UseTextures,true);
-  if (!initTextures(gl, n,u_UseTextures,0)) {
-    console.log('Failed to intialize the texture.');
+  if (!initTextures(gl, n,1)) {
+    console.log('Failed to intialize a texture.');
     return;
   }
+  gl.uniform1i(u_UseTextures,true);
+  if (!initTextures(gl, n,0)) {
+    console.log('Failed to intialize a texture.');
+    return;
+  }
+  
+
 
   if (!u_ModelMatrix || !u_ViewMatrix  || !u_NormalMatrix||!u_ProjMatrix  ||!u_AmbientLight ||!u_LightColor ||!u_LightPosition ||!u_isLighting ) { 
     console.log('Failed to Get the storage locations of u_ModelMatrix, u_ViewMatrix, and/or u_ProjMatrix');
@@ -186,7 +192,7 @@ gl.uniform3f(u_AmbientLight, 0.1, 0.1, 0.1);
 
   // Calculate the view matrix and the projection matrix
   
-  projMatrix.setPerspective(20, canvas.width/canvas.height, 1, 100);
+  projMatrix.setPerspective(50, canvas.width/canvas.height, 1, 100);
   viewMatrix.setLookAt(leftRight, upDown, fwdBack, 0, piv, -100, 0, 1, 0);
 //   currentAngle = animate(currentAngle);  // Update the rotation angle
   // Pass the model, view, and projection matrix to the uniform variable respectively
@@ -381,11 +387,11 @@ gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, texCoords, gl.STATIC_DRAW);
   gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW);
   return indices.length;
 }
-function initTextures(gl, n,u_UseTextures,img) {
-  if (img == 0){
-    imageName = './wall.jpg';
-  }else if (img ==1){
-    imageName = './grass.jpg';
+function initTextures(gl, n,img) {
+  if (img==0){
+    imageName = './wall.jpg'
+  }else if (img==1){
+    imageName = './grass.jpg'
   }
   var texture = gl.createTexture();   // Create a texture object
   if (!texture) {
@@ -407,14 +413,14 @@ function initTextures(gl, n,u_UseTextures,img) {
   }
 
   // Register the event handler to be called on loading an image
-  image.onload = function(){ loadTexture(gl, n, texture, u_Sampler, image,u_UseTextures); };
+  image.onload = function(){ loadTexture(gl, n, texture, u_Sampler, image); };
   // Tell the browser to load an image
   image.src = imageName;
 
   return true;
 }
 
-function loadTexture(gl, n, texture, u_Sampler, image, u_UseTextures) {
+function loadTexture(gl, n, texture, u_Sampler, image) {
   gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true); // Flip the image's y axis
 
   // Enable texture unit0
@@ -424,10 +430,10 @@ function loadTexture(gl, n, texture, u_Sampler, image, u_UseTextures) {
 
   gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, image);
 
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+  // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
 
   // Set the texture parameters
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
+  // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
   // Set the texture image
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
 
@@ -437,9 +443,72 @@ function loadTexture(gl, n, texture, u_Sampler, image, u_UseTextures) {
   
   gl.clear(gl.COLOR_BUFFER_BIT);   // Clear <canvas>
 
-  gl.drawElements(gl.TRIANGLES, n, gl.UNSIGNED_BYTE,0); // Draw the rectangle
 }
 
+
+function initVertexBuffersSphere(gl) { // Create a sphere
+  var SPHERE_DIV = 13;
+
+  var i, ai, si, ci;
+  var j, aj, sj, cj;
+  var p1, p2;
+
+  var positions = [];
+  var indices = [];
+
+  // Generate coordinates
+  for (j = 0; j <= SPHERE_DIV; j++) {
+    aj = j * Math.PI / SPHERE_DIV;
+    sj = Math.sin(aj);
+    cj = Math.cos(aj);
+    for (i = 0; i <= SPHERE_DIV; i++) {
+      ai = i * 2 * Math.PI / SPHERE_DIV;
+      si = Math.sin(ai);
+      ci = Math.cos(ai);
+
+      positions.push(si * sj);  // X
+      positions.push(cj);       // Y
+      positions.push(ci * sj);  // Z
+    }
+  }
+
+  // Generate indices
+  for (j = 0; j < SPHERE_DIV; j++) {
+    for (i = 0; i < SPHERE_DIV; i++) {
+      p1 = j * (SPHERE_DIV+1) + i;
+      p2 = p1 + (SPHERE_DIV+1);
+
+      indices.push(p1);
+      indices.push(p2);
+      indices.push(p1 + 1);
+
+      indices.push(p1 + 1);
+      indices.push(p2);
+      indices.push(p2 + 1);
+    }
+  }
+
+  // Write the vertex property to buffers (coordinates and normals)
+  // Same data can be used for vertex and normal
+  // In order to make it intelligible, another buffer is prepared separately
+  if (!initArrayBuffer(gl, 'a_Position', new Float32Array(positions), 3,gl.FLOAT,0,0)) return -1;
+  if (!initArrayBuffer(gl, 'a_Normal', new Float32Array(positions), 3,gl.FLOAT,0,0))  return -1;
+  
+
+  // Unbind the buffer object
+  // gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
+  // Write the indices to the buffer object
+  var indexBuffer = gl.createBuffer();
+  if (!indexBuffer) {
+    console.log('Failed to create the buffer object');
+    return -1;
+  }
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+  gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
+
+  return indices.length;
+}
 function initVertexBuffersCone(gl) {
         var vertices = new Float32Array([
           0, 0.5,   -0.5, -0.5,   0.5, -0.5
@@ -753,9 +822,9 @@ drawbox(gl, u_ModelMatrix, u_NormalMatrix, n);
 modelMatrix = popMatrix();
 
 //floor/grass
-// gl.uniform1i(u_UseTextures, true); // Will not apply lighting
+//  gl.uniform1i(u_UseTextures, true); // Will not apply lighting
 
-// if (!initTextures(gl, n,u_UseTextures,1)) {
+// if (!initTextures(gl, n,0)) {
 //   console.log('Failed to intialize the texture.');
 //   return;
 // }
@@ -765,7 +834,7 @@ modelMatrix.translate(-5,-7.1,-5);
 modelMatrix.scale(50,5,50);
 drawbox(gl, u_ModelMatrix, u_NormalMatrix, n);
 modelMatrix = popMatrix();
-// gl.uniform1i(u_UseTextures, false); // Will not apply lighting
+ gl.uniform1i(u_UseTextures, false); // Will not apply lighting
 
 var n = initVertexBuffersCone(gl);
   if (n < 0) {
@@ -808,6 +877,20 @@ modelMatrix.rotate(90,0,1,0);
 modelMatrix.scale(4.5,2.3,4);
 drawbox(gl, u_ModelMatrix, u_NormalMatrix, n);
 modelMatrix = popMatrix();
+
+// var n = initVertexBuffersSphere(gl);
+//   if (n < 0) {
+//     console.log('Failed to set the vertex information');
+//     return;
+//   }
+
+
+//   pushMatrix(modelMatrix);
+//   // changeColour(gl, 0.2,0.2,0.2);
+//   // modelMatrix.translate(3,3,3);
+//   // modelMatrix.scale(4.5,2.3,4);
+//   drawsphere(gl, u_ModelMatrix, u_NormalMatrix, n);
+//   modelMatrix = popMatrix();
 }
 function changeColour(gl,r,g,b){
     var colors = new Float32Array([    // Colors
@@ -835,6 +918,22 @@ function drawbox(gl, u_ModelMatrix, u_NormalMatrix, n) {
 
     // Draw the cube
     gl.drawElements(gl.TRIANGLES, n, gl.UNSIGNED_BYTE, 0);
+
+  modelMatrix = popMatrix();
+}
+function drawsphere(gl, u_ModelMatrix, u_NormalMatrix, n) {
+  pushMatrix(modelMatrix);
+
+    // Pass the model matrix to the uniform variable
+    gl.uniformMatrix4fv(u_ModelMatrix, false, modelMatrix.elements);
+
+    // Calculate the normal transformation matrix and pass it to u_NormalMatrix
+    g_normalMatrix.setInverseOf(modelMatrix);
+    g_normalMatrix.transpose();
+    gl.uniformMatrix4fv(u_NormalMatrix, false, g_normalMatrix.elements);
+
+    // Draw the cube
+    gl.drawElements(gl.TRIANGLES, n, gl.UNSIGNED_SHORT, 0);
 
   modelMatrix = popMatrix();
 }
