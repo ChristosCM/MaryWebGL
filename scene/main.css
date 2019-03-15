@@ -1,24 +1,21 @@
 div {
     display:inline-block;
+    margin:0;
 }  
 body {
     margin: 0;
   }
-/* h1{
-    display:inline-block;
-} */
+
+
 h2{
-    display:inline-block;
+    display:inline;
+    text-align: center;
 }
 
 canvas{
-    display:block;
+    display:inline;
 }
 p{
-    display:inline-block;
+    text-align: center;
+    display:inline;
 }
-.column {
-    float: left;
-    width: 50%;
-  }
-  

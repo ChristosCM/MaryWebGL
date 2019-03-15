@@ -7,28 +7,25 @@
   </head>
 
   <body onload="main()">
-    <div class = "row">
-    <div class="column">
-    <canvas id="webgl" width="800" height="800">
-    Please use a browser that supports "canvas"
-    </canvas>
-    </div>
-    <div class="column">
+  <div><p style="float: left;">  <canvas id="webgl" width="800" height="800"></p>
     <h1>Controls</h1>
-      <h2>W/S: </h2><p>Camera: Move Forward and Back</p>
-      <h2>A/D: </h2><p>Camera: Move Left and Right</p>
-      <h2>Q/E: </h2><p>Camera: Look Pivot Left and Pivot Right</p>
-      <h2>L: </h2><p>Toggle lights on and off</p>
-      <h2>Arrow Keys: </h2><p>Rotate object</p>
+    <h2>W/S: </h2><p>Camera: Move Forward and Back<br></p>
+    <h2>A/D: </h2><p>Camera: Move Left and Right (Looks at the object)<br/></p>
+    <h2>Q/E: </h2><p>Camera: Look Pivot Left and Pivot Right<br/></p>
+    <h2>T: </h2><p>Stop tracking the object<br/></p>
 
+    <h2>Mouse:</h2><p>Click and move to rotate the object<br/></p>
+    <h2>L: </h2><p>Toggle lights on and off<br/></p>
+    <h2>Arrow Keys: </h2><p>Move the purple kite<br/></p>
+    <h2>Space: </h2><p>Stop the bird<br></p>
 
+    <h2>Note: </h2><p>The trees seem like the go back and forth but that is an optical illusion. Look at them from the top to see them rotate normally</p>
 
-  </div>
-  </div>
+    </div>
     <script src="../lib/webgl-utils.js"></script>
     <script src="../lib/webgl-debug.js"></script>
     <script src="../lib/cuon-utils.js"></script>
     <script src="../lib/cuon-matrix.js"></script>
-    <script src="./scene3.js"></script>
+    <script src="./scene.js"></script>
   </body>
 </html>
